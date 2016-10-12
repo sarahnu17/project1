@@ -33,7 +33,7 @@ public:
 		double _price) {
 		// TODO: implement this function properly
 		if (_price < 0 || _code.length() > 14) {
-			throw std::logic_error("not implemented yet");
+			throw std::invalid_argument("price must be positive and code length must be 14");
 		}
 		else {
 			name = _name;
@@ -42,7 +42,6 @@ public:
 		}
 	}
 
-	~Product() { }
 
 	// Accessors.
 	const std::string& getCode() const { return code; }
@@ -65,11 +64,18 @@ public:
 	// std::invalid_argument.
 	Catalog(int _maxProducts) {
 		// TODO: implement this function properly
-		if (maxProducts < 0)
-			throw std::logic_error("not implemented yet");
-		else {
-			maxProducts = _maxProducts;
-			ptr = new Product[_maxProducts];
+		if (_maxProducts > 130000)
+		{
+			_maxProducts = 130000;
+		}
+		maxProducts = _maxProducts;
+		if (maxProducts <= 0)
+		{
+			throw std::invalid_argument("max must be positive integer");
+		}
+		else
+		{
+			ptr = new Product[maxProducts];
 		}
 
 	}
@@ -78,16 +84,13 @@ public:
 		// TODO: implement this function properly
 		delete[] ptr;
 		ptr = NULL;
-			
+
 	}
 
 	// Accessors.
 	int getMaxProducts() const {
 		// TODO: implement this function properly
-		if (maxProducts < 0)
-			throw std::logic_error("not implemented yet");
-		else 
-			return maxProducts;
+		return maxProducts;
 	}
 
 	int getNumProducts() const {
@@ -98,7 +101,13 @@ public:
 	// Return true when the catalog cannot fit any more products.
 	bool isFull() const {
 		// TODO: implement this function properly
-		return (numProducts == maxProducts);
+		if (numProducts == maxProducts) {
+			return true;
+
+		}
+		else {
+			return false;
+		}
 	}
 
 	// Add a new product to the catalog with a given code and name.
@@ -114,30 +123,26 @@ public:
 		const std::string& _name,
 		double _price) {
 		// TODO: implement this function properly
-		for (int i = 0; i < numProducts; i++) {
-			if (isFull())
-			{
-				throw std::logic_error("not implemented yet");
-			}
+
+		if (isFull())
+		{
+			throw std::overflow_error("No entry can be made, Catalog is full");
+		}
+		if (!isFull())
+		{
+			if (_price <= 0.0)
+				throw std::invalid_argument("Price must be greater than 0.");
 			else
 			{
-				if (ptr[i].getCode() == _code)
+				for (int i = 0; i < numProducts; i++)
 				{
-					throw std::logic_error("not implemented yet");
-				}
-				else
-				{
-					if (_price < 0)
-					{
-						throw std::logic_error("not implemented yet");
-					}
-					else
-					{
-						ptr[numProducts-1] = Product(_code, _name, _price);
-					}
+					if (ptr[i].getCode() == _code)
+						throw std::invalid_argument("Already exist");
 				}
 			}
 		}
+		Product temp(_code, _name, _price);
+		ptr[numProducts] = temp;
 		numProducts++;
 	}
 
@@ -149,26 +154,24 @@ public:
 	//
 	// Throw std::invalid_argument if no product with that code exists
 	// in the catalog.
-	const Product& findCode(const std::string& _code) const 
+	const Product& findCode(const std::string& _code) const
 	{
 		// TODO: implement this function properly
-
-		for (int i = 0; i < numProducts; i++) 
+		for (int i = 0; i < numProducts; i++)
 		{
-			if (ptr[i].getCode() == _code) 
+			if (ptr[i].getCode() == _code)
 			{
 				return ptr[i];
 			}
-			else 
-			{
-				throw std::logic_error("not implemented yet");
-			}
+
 		}
+		throw std::invalid_argument("search failed");
 	}
+
 
 private:
 	// TODO: add data members
 	Product *ptr;
 	int maxProducts;
-	int numProducts;
+	int numProducts = 0;
 };
